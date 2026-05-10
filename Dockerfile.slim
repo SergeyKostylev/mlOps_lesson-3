@@ -1,0 +1,15 @@
+FROM python:3.9-slim AS builder
+
+RUN pip install --no-cache-dir --prefix=/install \
+    torch torchvision pillow
+
+FROM python:3.9-slim AS runtime
+
+COPY --from=builder /install /usr/local
+
+WORKDIR /app
+COPY model.pt .
+COPY inference.py .
+COPY imagenet_labels.json .
+
+ENTRYPOINT ["python", "inference.py"]
